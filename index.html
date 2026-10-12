@@ -274,7 +274,7 @@
             
             <div class="scramble-box-wrapper">
                 <div id="pseudo-badge" class="pseudo-badge">Pseudo: R</div>
-                <div id="scramble-display" class="scramble-box">生成ボタンを押してください</div>
+                <div id="scramble-display" class="scramble-box">読み込み中...</div>
             </div>
 
             <!-- 答え合わせ：左右ビジュアル比較パネル -->
@@ -366,7 +366,6 @@
             let activeCheckboxes = Array.from(checkboxes).map(cb => cb.value);
 
             let pseudoToken = "";
-            let aufToken = "";
             let pureTokens = [];
 
             // 1. まず純粋なL4Eブロック列を生成
@@ -407,17 +406,11 @@
             let reducedPureTokens = reduceMoveString(pureTokens);
             currentData.pure = reducedPureTokens.join(" ");
 
-            // 3. Pseudo-V 選択がある場合、境界を再キャンセルしてフルスクランブルを作成
+            // 3. Pseudo-V 選択がある場合、先頭に1手合体させてフルスクランブルを作成
             if (activeCheckboxes.length > 0) {
                 pseudoToken = activeCheckboxes[Math.floor(Math.random() * activeCheckboxes.length)];
                 
-                let combined = [pseudoToken];
-                if (Math.random() < 0.5) {
-                    aufToken = Math.random() < 0.5 ? "U" : "U'";
-                    combined.push(aufToken);
-                }
-                combined.push(...reducedPureTokens);
-
+                let combined = [pseudoToken, ...reducedPureTokens];
                 let reducedFullTokens = reduceMoveString(combined);
                 currentData.full = reducedFullTokens.join(" ");
             } else {
@@ -437,12 +430,12 @@
             document.getElementById('full-visual-img').src = `https://api.cuberoot.me/v1/visualcube.svg?alg=${encodedFull}&pzl=pyra`;
             document.getElementById('pure-visual-img').src = `https://api.cuberoot.me/v1/visualcube.svg?alg=${encodedPure}&pzl=pyra`;
 
-            // バッジの表示切り替え部分
-const badge = document.getElementById('pseudo-badge');
-if (pseudoToken) {
-    badge.textContent = aufToken ? `Pseudo: ${pseudoToken} ${aufToken}` : `Pseudo: ${pseudoToken}`;
-    badge.style.display = "block";
-} else { ... }
+            // バッジの表示切り替え（常に1手のみ表示）
+            const badge = document.getElementById('pseudo-badge');
+            if (pseudoToken) {
+                badge.textContent = `Pseudo: ${pseudoToken}`;
+                badge.style.display = "block";
+            } else {
                 badge.textContent = "Pure L4E";
                 badge.style.backgroundColor = "#64748b";
                 badge.style.display = "block";
@@ -464,7 +457,7 @@ if (pseudoToken) {
         // コピーボタン
         document.getElementById('copy-btn').addEventListener('click', async () => {
             const text = currentData.full;
-            if (!text || text.includes("生成ボタン")) return;
+            if (!text) return;
             try {
                 await navigator.clipboard.writeText(text);
                 const btn = document.getElementById('copy-btn');
@@ -478,7 +471,7 @@ if (pseudoToken) {
 
         document.getElementById('generate-btn').addEventListener('click', generateScramble);
 
-        // 初回ロード時生成
+        // 初回ロード時自動生成
         generateScramble();
     </script>
 </body>
