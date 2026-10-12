@@ -437,12 +437,12 @@
             document.getElementById('full-visual-img').src = `https://api.cuberoot.me/v1/visualcube.svg?alg=${encodedFull}&pzl=pyra`;
             document.getElementById('pure-visual-img').src = `https://api.cuberoot.me/v1/visualcube.svg?alg=${encodedPure}&pzl=pyra`;
 
-            // バッジの表示切り替え
-            const badge = document.getElementById('pseudo-badge');
-            if (pseudoToken) {
-                badge.textContent = aufToken ? `Pseudo: ${pseudoToken} ${aufToken}` : `Pseudo: ${pseudoToken}`;
-                badge.style.display = "block";
-            } else {
+            // バッジの表示切り替え部分
+const badge = document.getElementById('pseudo-badge');
+if (pseudoToken) {
+    badge.textContent = aufToken ? `Pseudo: ${pseudoToken} ${aufToken}` : `Pseudo: ${pseudoToken}`;
+    badge.style.display = "block";
+} else { ... }
                 badge.textContent = "Pure L4E";
                 badge.style.backgroundColor = "#64748b";
                 badge.style.display = "block";
