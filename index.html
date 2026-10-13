@@ -300,7 +300,6 @@
     </style>
 </head>
 <body>
-Recognize
     <div class="container">
         <h1>Pseudo-V Recognition Practice Tool</h1>
 
@@ -448,7 +447,7 @@ Recognize
 
         function renderHistory() {
             if (recentTimes.length === 0) {
-                historyList.innerHTML = '<span style="color: var(--text-muted); font-size: 0.75rem;">直近履歴なし</span>';
+                historyList.innerHTML = '<span style="color: var(--text-muted); font-size: 0.75rem;">直近3回の履歴なし</span>';
                 return;
             }
             historyList.innerHTML = recentTimes.map((t, idx) => `
