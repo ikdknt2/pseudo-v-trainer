@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pseudo-V Recognize Practice & Visual Comparison</title>
+    <title>Pseudo-V Training</title>
     <style>
         :root {
             --bg-color: #0f172a;
@@ -87,37 +87,19 @@
             cursor: pointer;
         }
 
-        .slider-container {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-
-        .slider-header {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.9rem;
-        }
-
-        input[type="range"] {
-            width: 100%;
-            accent-color: var(--accent);
-            cursor: pointer;
-        }
-
-        /* メインスクランブル表示エリア */
+        /* メインスクランブル表示枠 */
         .scramble-box-wrapper {
             position: relative;
             background-color: rgba(0, 0, 0, 0.2);
             border: 1px solid var(--border);
             border-radius: 8px;
-            padding: 24px 16px 16px 16px;
-            margin-bottom: 12px;
+            padding: 38px 16px 16px 16px;
+            margin-bottom: 16px;
         }
 
         .pseudo-badge {
             position: absolute;
-            top: 8px;
+            top: 10px;
             left: 10px;
             background-color: var(--badge-bg);
             color: white;
@@ -126,6 +108,7 @@
             padding: 2px 8px;
             border-radius: 4px;
             letter-spacing: 0.03em;
+            z-index: 2;
         }
 
         .scramble-box {
@@ -138,29 +121,26 @@
             align-items: center;
             justify-content: center;
             letter-spacing: 0.05em;
+            line-height: 1.4;
         }
 
-        /* 答え合わせビジュアル比較パネル（左右2カラム） */
+        /* 左右ビジュアル比較パネル */
         .answer-panel {
-            display: none;
+            display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 12px;
             margin-bottom: 16px;
         }
 
-        .answer-panel.active {
-            display: grid;
-        }
-
         @media (max-width: 600px) {
-            .answer-panel.active {
+            .answer-panel {
                 grid-template-columns: 1fr;
             }
         }
 
         .state-card {
             background-color: rgba(15, 23, 42, 0.6);
-            border: 1px dashed var(--border);
+            border: 1px solid var(--border);
             border-radius: 8px;
             padding: 12px;
             display: flex;
@@ -168,22 +148,16 @@
             align-items: center;
         }
 
+        .main-state-card {
+            border-color: var(--accent);
+        }
+
         .state-title {
             font-size: 0.8rem;
             color: var(--text-muted);
-            margin-bottom: 6px;
+            margin-bottom: 8px;
             font-weight: 500;
             text-align: center;
-        }
-
-        .state-alg {
-            font-family: monospace;
-            font-size: 0.85rem;
-            color: #38bdf8;
-            word-break: break-all;
-            text-align: center;
-            margin-bottom: 10px;
-            min-height: 30px;
         }
 
         .visual-container {
@@ -196,13 +170,99 @@
             width: 100%;
             max-width: 200px;
             height: 180px;
+            position: relative;
         }
 
         .visual-container img {
             max-width: 100%;
             max-height: 100%;
             object-fit: contain;
-            cursor: grab;
+            display: none;
+        }
+
+        .placeholder-text {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        /* 答えがアクティブなときの状態切り替え */
+        .visual-container.revealed .placeholder-text {
+            display: none;
+        }
+        .visual-container.revealed img {
+            display: block;
+        }
+
+        /* タイマーセクション（中央配置） */
+        .timer-section {
+            background-color: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 14px;
+            margin-bottom: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .timer-display {
+            font-family: monospace;
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            color: var(--text-color);
+        }
+
+        .timer-controls {
+            display: flex;
+            gap: 8px;
+            width: 100%;
+            max-width: 280px;
+        }
+
+        .timer-btn {
+            flex: 1;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            border: 1px solid var(--border);
+            background-color: rgba(255, 255, 255, 0.05);
+            color: var(--text-color);
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .timer-btn:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .timer-btn.primary {
+            background-color: var(--accent);
+            border-color: var(--accent);
+            color: white;
+        }
+
+        .timer-btn.primary:hover {
+            background-color: var(--accent-hover);
+        }
+
+        /* 直近3回履歴の表示 */
+        .history-list {
+            display: flex;
+            gap: 8px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-family: monospace;
+        }
+
+        .history-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            padding: 2px 8px;
+            border-radius: 4px;
         }
 
         .btn-group {
@@ -240,13 +300,13 @@
     </style>
 </head>
 <body>
-
+Recognize
     <div class="container">
-        <h1>Pseudo-V Recognize Practice</h1>
+        <h1>Pseudo-V Recognition Practice Tool</h1>
 
         <!-- Pseudo-V チェックボックス設定 -->
         <div class="section">
-            <div class="section-title">Pseudo-V ターゲット選択 (未選択で純粋L4E)</div>
+            <div class="section-title">Pseudo-V の種類を選択(選択なしでただのL4E)</div>
             <div class="checkbox-group">
                 <label class="checkbox-label"><input type="checkbox" name="pv" value="R" checked> R</label>
                 <label class="checkbox-label"><input type="checkbox" name="pv" value="R'" checked> R'</label>
@@ -257,52 +317,53 @@
             </div>
         </div>
 
-        <!-- ブロック数スライダー設定 -->
+        <!-- メインのスクランブル表示エリア -->
         <div class="section">
-            <div class="slider-container">
-                <div class="slider-header">
-                    <span class="section-title" style="margin:0;">ブロック数 (L4Eの複雑さ)</span>
-                    <span id="slider-value" style="font-weight: 500;">5</span>
-                </div>
-                <input type="range" id="block-slider" min="2" max="8" value="5">
-            </div>
-        </div>
-
-        <!-- スクランブル表示エリア -->
-        <div class="section">
-            <div class="section-title">スクランブル (Full Scramble)</div>
-            
+            <div class="section-title">スクランブル</div>
             <div class="scramble-box-wrapper">
                 <div id="pseudo-badge" class="pseudo-badge">Pseudo: R</div>
                 <div id="scramble-display" class="scramble-box">読み込み中...</div>
             </div>
 
-            <!-- 答え合わせ：左右ビジュアル比較パネル -->
-            <div id="answer-panel" class="answer-panel">
-                <!-- 1つ目：フルスクランブル状態 -->
-                <div class="state-card">
-                    <div class="state-title">1. Full Scramble 適用状態</div>
-                    <div id="full-alg-text" class="state-alg">-</div>
-                    <div class="visual-container">
+            <!-- 左右ビジュアル比較エリア -->
+            <div class="answer-panel">
+                <!-- 1つ目：フルスクランブル状態の画像 -->
+                <div class="state-card main-state-card">
+                    <div class="state-title">スクランブル</div>
+                    <div class="visual-container revealed">
                         <img id="full-visual-img" src="" alt="Full Scramble State">
                     </div>
                 </div>
-                <!-- 2つ目：Pure L4E状態（Pseudoの1手を除いた状態） -->
+
+                <!-- 2つ目：Pure L4E状態（枠は常時固定、中はHidden） -->
                 <div class="state-card">
-                    <div class="state-title">2. Pure L4E 状態 (Pseudoなし)</div>
-                    <div id="pure-alg-text" class="state-alg">-</div>
-                    <div class="visual-container">
+                    <div class="state-title">答え(回すべきL4E)</div>
+                    <div id="pure-visual-box" class="visual-container">
+                        <span class="placeholder-text">Hidden</span>
                         <img id="pure-visual-img" src="" alt="Pure L4E State">
                     </div>
                 </div>
             </div>
 
             <div class="btn-group">
-                <button class="action-btn secondary-btn" id="toggle-answer-btn">👁️ 答え合わせを表示</button>
-                <button class="action-btn secondary-btn" id="copy-btn">📋 コピー</button>
+                <button class="action-btn secondary-btn" id="toggle-answer-btn">答え合わせを表示 (Shift+Enter)</button>
+                <button class="action-btn secondary-btn" id="copy-btn">コピー</button>
             </div>
-            <div class="btn-group" style="margin-top: 8px;">
-                <button class="action-btn" id="generate-btn">🔄 次のスクランブル</button>
+
+            <!-- タイマーセクション -->
+            <div class="timer-section">
+                <div id="timer-display" class="timer-display">0.00s</div>
+                <div class="timer-controls">
+                    <button id="timer-action-btn" class="timer-btn primary">スタート</button>
+                    <button id="timer-reset-btn" class="timer-btn">リセット</button>
+                </div>
+                <div class="history-list" id="history-list">
+                    <span style="color: var(--text-muted); font-size: 0.75rem;">直近3回の履歴なし</span>
+                </div>
+            </div>
+
+            <div class="btn-group">
+                <button class="action-btn" id="generate-btn">🔄 次のスクランブル (Ctrl+Enter)</button>
             </div>
         </div>
     </div>
@@ -325,24 +386,122 @@
 
         const inverseMap = { 1: 2, 2: 1, 3: 4, 4: 3, 5: 6, 6: 5 };
 
-        const slider = document.getElementById('block-slider');
-        const sliderValue = document.getElementById('slider-value');
-        slider.addEventListener('input', () => {
-            sliderValue.textContent = slider.value;
-        });
-
         let currentData = {
             full: "",
             pure: ""
         };
 
-        // 共通の相殺処理エンジン
+        // タイマー状態変数
+        let timerState = 'stopped'; // 'stopped' | 'running' | 'finished'
+        let startTime = 0;
+        let elapsedTime = 0;
+        let timerInterval = null;
+        let recentTimes = [];
+
+        const timerDisplay = document.getElementById('timer-display');
+        const timerActionBtn = document.getElementById('timer-action-btn');
+        const timerResetBtn = document.getElementById('timer-reset-btn');
+        const historyList = document.getElementById('history-list');
+
+        function formatTime(ms) {
+            return (ms / 1000).toFixed(2) + 's';
+        }
+
+        function updateTimerDisplay() {
+            let currentMs = elapsedTime;
+            if (timerState === 'running') {
+                currentMs = Date.now() - startTime;
+            }
+            timerDisplay.textContent = formatTime(currentMs);
+        }
+
+        function startTimer() {
+            if (timerState === 'finished') return; // リセットするまで再スタート不可
+            startTime = Date.now() - elapsedTime;
+            timerInterval = setInterval(updateTimerDisplay, 10);
+            timerState = 'running';
+            timerActionBtn.textContent = 'ストップ';
+        }
+
+        function stopTimer() {
+            if (timerState !== 'running') return;
+            clearInterval(timerInterval);
+            elapsedTime = Date.now() - startTime;
+            timerState = 'finished';
+            timerActionBtn.textContent = 'スタート';
+            updateTimerDisplay();
+
+            // 終了時に直近履歴へ追加（最新が左、最大3件）
+            recentTimes.unshift(elapsedTime);
+            if (recentTimes.length > 3) recentTimes.pop();
+            renderHistory();
+        }
+
+        function resetTimer() {
+            clearInterval(timerInterval);
+            timerState = 'stopped';
+            startTime = 0;
+            elapsedTime = 0;
+            timerDisplay.textContent = '0.00s';
+            timerActionBtn.textContent = 'スタート';
+        }
+
+        function renderHistory() {
+            if (recentTimes.length === 0) {
+                historyList.innerHTML = '<span style="color: var(--text-muted); font-size: 0.75rem;">直近履歴なし</span>';
+                return;
+            }
+            historyList.innerHTML = recentTimes.map((t, idx) => `
+                <div class="history-item">${idx === 0 ? '1st' : idx === 1 ? '2nd' : '3rd'}: ${formatTime(t)}</div>
+            `).join('');
+        }
+
+        timerActionBtn.addEventListener('click', () => {
+            if (timerState === 'stopped') {
+                startTimer();
+            } else if (timerState === 'running') {
+                stopTimer();
+            }
+        });
+
+        timerResetBtn.addEventListener('click', resetTimer);
+
+        // 拡張された相殺・マージ処理エンジン
         function reduceMoveString(moveList) {
             let list = [...moveList];
             let changed = true;
 
             while (changed) {
                 changed = false;
+                
+                for (let i = 0; i < list.length - 1; i++) {
+                    let m1 = list[i];
+                    let m2 = list[i+1];
+
+                    if ((m1 === "R" && m2 === "R") || (m1 === "R'" && m2 === "R'")) {
+                        list.splice(i, 2, (m1 === "R") ? "R'" : "R");
+                        changed = true;
+                        break;
+                    }
+                    if ((m1 === "L" && m2 === "L") || (m1 === "L'" && m2 === "L'")) {
+                        list.splice(i, 2, (m1 === "L") ? "L'" : "L");
+                        changed = true;
+                        break;
+                    }
+                    if ((m1 === "B" && m2 === "B") || (m1 === "B'" && m2 === "B'")) {
+                        list.splice(i, 2, (m1 === "B") ? "B'" : "B");
+                        changed = true;
+                        break;
+                    }
+                    if ((m1 === "U" && m2 === "U") || (m1 === "U'" && m2 === "U'")) {
+                        list.splice(i, 2, (m1 === "U") ? "U'" : "U");
+                        changed = true;
+                        break;
+                    }
+                }
+
+                if (changed) continue;
+
                 for (let i = 0; i < list.length - 1; i++) {
                     let m1 = list[i];
                     let m2 = list[i+1];
@@ -368,8 +527,8 @@
             let pseudoToken = "";
             let pureTokens = [];
 
-            // 1. まず純粋なL4Eブロック列を生成
-            let numBlocks = parseInt(slider.value);
+            // 5ブロック固定で生成
+            let numBlocks = 5;
             let lastGroup = -1;
 
             for (let i = 0; i < numBlocks; i++) {
@@ -402,14 +561,11 @@
                 pureTokens.push(Math.random() < 0.5 ? "U" : "U'");
             }
 
-            // 2. 純粋L4Eの縮約完了
             let reducedPureTokens = reduceMoveString(pureTokens);
             currentData.pure = reducedPureTokens.join(" ");
 
-            // 3. Pseudo-V 選択がある場合、先頭に1手合体させてフルスクランブルを作成
             if (activeCheckboxes.length > 0) {
                 pseudoToken = activeCheckboxes[Math.floor(Math.random() * activeCheckboxes.length)];
-                
                 let combined = [pseudoToken, ...reducedPureTokens];
                 let reducedFullTokens = reduceMoveString(combined);
                 currentData.full = reducedFullTokens.join(" ");
@@ -417,20 +573,13 @@
                 currentData.full = currentData.pure;
             }
 
-            // 4. 画面への反映
             document.getElementById('scramble-display').textContent = currentData.full;
-            
-            // 答え合わせパネル内のテキスト
-            document.getElementById('full-alg-text').textContent = currentData.full;
-            document.getElementById('pure-alg-text').textContent = currentData.pure;
 
-            // VisualCube API 画像の設定 (URLエンコード)
             const encodedFull = encodeURIComponent(currentData.full);
             const encodedPure = encodeURIComponent(currentData.pure);
             document.getElementById('full-visual-img').src = `https://api.cuberoot.me/v1/visualcube.svg?alg=${encodedFull}&pzl=pyra`;
             document.getElementById('pure-visual-img').src = `https://api.cuberoot.me/v1/visualcube.svg?alg=${encodedPure}&pzl=pyra`;
 
-            // バッジの表示切り替え（常に1手のみ表示）
             const badge = document.getElementById('pseudo-badge');
             if (pseudoToken) {
                 badge.textContent = `Pseudo: ${pseudoToken}`;
@@ -441,18 +590,26 @@
                 badge.style.display = "block";
             }
 
-            // パネルを閉じる
-            document.getElementById('answer-panel').classList.remove('active');
-            document.getElementById('toggle-answer-btn').textContent = "👁️ 答え合わせを表示";
+            // 新規スクランブル生成時に答えを非表示にリセット
+            document.getElementById('pure-visual-box').classList.remove('revealed');
+            document.getElementById('toggle-answer-btn').textContent = "答え合わせを表示 (Shift+Enter)";
+
+            // タイマーも確実にリセット
+            resetTimer();
+            recentTimes = [];
+            renderHistory();
         }
 
-        // 答え合わせトグルボタン
-        document.getElementById('toggle-answer-btn').addEventListener('click', () => {
-            const panel = document.getElementById('answer-panel');
+        // 答え合わせトグル処理
+        function toggleAnswer() {
+            const pureBox = document.getElementById('pure-visual-box');
             const btn = document.getElementById('toggle-answer-btn');
-            panel.classList.toggle('active');
-            btn.textContent = panel.classList.contains('active') ? "🙈 答え合わせを隠す" : "👁️ 答え合わせを表示";
-        });
+            pureBox.classList.toggle('revealed');
+            const isRevealed = pureBox.classList.contains('revealed');
+            btn.textContent = isRevealed ? "答え合わせを隠す (Shift+Enter)" : "答え合わせを表示 (Shift+Enter)";
+        }
+
+        document.getElementById('toggle-answer-btn').addEventListener('click', toggleAnswer);
 
         // コピーボタン
         document.getElementById('copy-btn').addEventListener('click', async () => {
@@ -462,7 +619,7 @@
                 await navigator.clipboard.writeText(text);
                 const btn = document.getElementById('copy-btn');
                 const orig = btn.textContent;
-                btn.textContent = '✨ コピー完了';
+                btn.textContent = 'コピー完了';
                 setTimeout(() => btn.textContent = orig, 1500);
             } catch (err) {
                 alert('コピーに失敗しました');
@@ -471,8 +628,68 @@
 
         document.getElementById('generate-btn').addEventListener('click', generateScramble);
 
+        // キーボードショートカット設定
+        window.addEventListener('keydown', (e) => {
+            // 入力要素などにフォーカスがある場合を除外するため body 直下の判定にする
+            if (e.code === 'Space' && e.target === document.body) {
+                e.preventDefault(); // 画面スクロール防止
+                if (timerState === 'stopped') {
+                    startTimer();
+                } else if (timerState === 'running') {
+                    stopTimer();
+                }
+            } else if (timerState === 'running') {
+                // タイマー稼働中はどのキーを押してもストップできる
+                stopTimer();
+            } else if (e.shiftKey && e.key === 'Enter') {
+                e.preventDefault();
+                toggleAnswer();
+            } else if (e.ctrlKey && e.key === 'Enter') {
+                e.preventDefault();
+                generateScramble();
+            }
+        });
+
         // 初回ロード時自動生成
         generateScramble();
     </script>
+<!-- Code injected by live-server -->
+<script>
+	// <![CDATA[  <-- For SVG support
+	if ('WebSocket' in window) {
+		(function () {
+			function refreshCSS() {
+				var sheets = [].slice.call(document.getElementsByTagName("link"));
+				var head = document.getElementsByTagName("head")[0];
+				for (var i = 0; i < sheets.length; ++i) {
+					var elem = sheets[i];
+					var parent = elem.parentElement || head;
+					parent.removeChild(elem);
+					var rel = elem.rel;
+					if (elem.href && typeof rel != "string" || rel.length == 0 || rel.toLowerCase() == "stylesheet") {
+						var url = elem.href.replace(/(&|\?)_cacheOverride=\d+/, '');
+						elem.href = url + (url.indexOf('?') >= 0 ? '&' : '?') + '_cacheOverride=' + (new Date().valueOf());
+					}
+					parent.appendChild(elem);
+				}
+			}
+			var protocol = window.location.protocol === 'http:' ? 'ws://' : 'wss://';
+			var address = protocol + window.location.host + window.location.pathname + '/ws';
+			var socket = new WebSocket(address);
+			socket.onmessage = function (msg) {
+				if (msg.data == 'reload') window.location.reload();
+				else if (msg.data == 'refreshcss') refreshCSS();
+			};
+			if (sessionStorage && !sessionStorage.getItem('IsThisFirstTime_Log_From_LiveServer')) {
+				console.log('Live reload enabled.');
+				sessionStorage.setItem('IsThisFirstTime_Log_From_LiveServer', true);
+			}
+		})();
+	}
+	else {
+		console.error('Upgrade your browser. This Browser is NOT supported WebSocket for Live-Reloading.');
+	}
+	// ]]>
+</script>
 </body>
 </html>
